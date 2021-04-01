@@ -1,15 +1,15 @@
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { FormError } from "../conponents/form-error";
+import { FormError } from "../components/form-error";
 import nuberLogo from "../images/logo.svg"
-import { Button } from "../conponents/button";
+import { Button } from "../components/button";
 import { Link, useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { createAccountMutation, createAccountMutationVariables } from "../__generated__/createAccountMutation";
 import { UserRole } from "../__generated__/globalTypes";
 
-const CREATE_ACCOUNT_MUTATION = gql`
+export const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccountMutation($createAccountInput: CreateAccountInput!) {
     createAccount(input: $createAccountInput){
       ok
@@ -34,7 +34,7 @@ export const CreateAccount = () => {
   });
   const history = useHistory()
   const onCompleted = (data: createAccountMutation) => {
-    const { createAccount: { ok, error } } = data;
+    const { createAccount: { ok } } = data;
     if (ok) {
       alert("Account Created! Log in now!")
       history.push('/')
@@ -96,8 +96,8 @@ export const CreateAccount = () => {
             placeholder="Password"
             className="input"
           />
-          {errors.email?.message && (
-            <FormError errorMessage={errors.email?.message} />
+          {errors.password?.message && (
+            <FormError errorMessage={errors.password?.message} />
           )}
           <select name="role" ref={register({ required: true })} className="input">
             {Object.keys(UserRole).map((role, index) => <option key={index}>{role}</option>)}

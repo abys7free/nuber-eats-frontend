@@ -1,16 +1,16 @@
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { FormError } from "../conponents/form-error";
+import { FormError } from "../components/form-error";
 import { loginMutation, loginMutationVariables } from "../__generated__/loginMutation";
 import nuberLogo from "../images/logo.svg"
-import { Button } from "../conponents/button";
+import { Button } from "../components/button";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { authTokenVar, isLoggedInVar } from "../apollo";
 import { LOCALSTORAGE_TOKEN } from "../constants";
 
-const LOGIN_MUTATION = gql`
+export const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
     login(input: $loginInput){
       ok
@@ -31,7 +31,7 @@ export const Login = () => {
     mode: "onChange"
   });
   const onCompleted = (data: loginMutation) => {
-    const { login: { error, ok, token } } = data;
+    const { login: { ok, token } } = data;
     if (ok && token) {
       localStorage.setItem(LOCALSTORAGE_TOKEN, token)
       authTokenVar(token);
@@ -71,7 +71,10 @@ export const Login = () => {
           className="grid gap-3 mt-5 w-full mb-5"
         >
           <input
-            ref={register({ required: "Email is required" })}
+            ref={register({
+              required: "Email is required", pattern:
+                /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            })}
             name="email"
             required
             type="email"
@@ -92,8 +95,8 @@ export const Login = () => {
             placeholder="Password"
             className="input"
           />
-          {errors.email?.message && (
-            <FormError errorMessage={errors.email?.message} />
+          {errors.password?.message && (
+            <FormError errorMessage={errors.password?.message} />
           )}
           <Button canClick={formState.isValid} loading={loading} actionText={"Log in"} />
           {loginMutationResult?.login.error && <FormError errorMessage={loginMutationResult.login.error} />}
