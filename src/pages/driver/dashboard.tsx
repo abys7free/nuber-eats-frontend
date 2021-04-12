@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import GoogleMapReact from 'google-map-react';
-import { AnyAaaaRecord } from 'node:dns';
-import { result } from 'cypress/types/lodash';
 import { gql, useMutation, useSubscription } from '@apollo/client';
 import { FULL_ORDER_FRAGMENT } from '../../fragments';
 import { cookedOrders } from '../../__generated__/cookedOrders';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { takeOrder, takeOrderVariables } from '../../__generated__/takeOrder';
 
 const COOKED_ORDERS_SUBSCRIPTION = gql`
@@ -30,13 +28,13 @@ interface ICoords {
   lng: number;
 }
 
-interface IDriverProps {
-  lat: number;
-  lng: number;
-  $hover?: any;
-}
+// interface IDriverProps {
+//   lat: number;
+//   lng: number;
+//   $hover?: any;
+// }
 
-const Driver: React.FC<IDriverProps> = (lat, lng) => <div className="text-lg">🚖</div>;
+// const Driver: React.FC<IDriverProps> = (lat, lng) => <div className="text-lg">🚖</div>;
 
 export const Dashboard = () => {
   const [driverCoords, setDriverCoords] = useState<ICoords>({ lng: 0, lat: 0 })

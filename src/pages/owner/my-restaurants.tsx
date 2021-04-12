@@ -1,9 +1,9 @@
-import { gql, useApolloClient, useQuery } from '@apollo/client'
-import React, { useEffect } from 'react'
+import { gql, useQuery } from '@apollo/client'
+import React from 'react'
 import { Helmet } from 'react-helmet'
 import { Link } from 'react-router-dom'
 import { Restaurant } from '../../components/restaurant'
-import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from '../../fragments'
+import { RESTAURANT_FRAGMENT } from '../../fragments'
 import { myRestaurants } from '../../__generated__/myRestaurants'
 
 export const MY_RESTAURANTS_QUERY = gql`
