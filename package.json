@@ -5,11 +5,14 @@
   "dependencies": {
     "@apollo/client": "^3.3.12",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-brands-svg-icons": "^5.15.3",
+    "@fortawesome/free-regular-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "@types/google-map-react": "^2.1.0",
     "@types/jest": "^26.0.15",
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.3",
@@ -19,6 +22,7 @@
     "apollo": "^2.32.5",
     "autoprefixer": "^10.2.5",
     "cypress": "^6.8.0",
+    "google-map-react": "^2.1.9",
     "graphql": "^15.5.0",
     "postcss": "^8.2.8",
     "react": "^17.0.2",
@@ -29,8 +33,10 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "rimraf": "^3.0.2",
+    "subscriptions-transport-ws": "^0.9.18",
     "tailwindcss": "^2.0.4",
     "typescript": "^4.1.2",
+    "victory": "^35.5.0",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
@@ -69,6 +75,7 @@
   },
   "devDependencies": {
     "@testing-library/cypress": "^7.0.5",
+    "@types/googlemaps": "^3.43.3",
     "mock-apollo-client": "^1.0.0"
   }
 }
