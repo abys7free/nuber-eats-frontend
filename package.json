@@ -21,6 +21,7 @@
     "@types/react-router-dom": "^5.1.7",
     "apollo": "^2.32.5",
     "autoprefixer": "^10.2.5",
+    "cross-env": "^7.0.3",
     "cypress": "^6.8.0",
     "google-map-react": "^2.1.9",
     "graphql": "^15.5.0",
@@ -40,7 +41,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "tailwind:probuild" : "cross-env NODE_ENV=production npm run tailwind:build",
+    "tailwind:probuild": "cross-env NODE_ENV=production npm run tailwind:build",
     "tailwind:build": "tailwind build ./src/styles/tailwind.css -o ./src/styles/styles.css",
     "apollo:codegen": "rimraf src/__generated__ && apollo client:codegen src/__generated__ --target=typescript --outputFlat",
     "start": "npm run apollo:codegen & npm run tailwind:build & react-scripts start",
