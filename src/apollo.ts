@@ -10,25 +10,29 @@ import { LOCALSTORAGE_TOKEN } from "./constants";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
-
-
 const token = localStorage.getItem(LOCALSTORAGE_TOKEN);
 
 export const isLoggedInVar = makeVar(Boolean(token));
 export const authTokenVar = makeVar(token);
 
 const wsLink = new WebSocketLink({
-  uri: `ws://localhost:4000/graphql`,
+  uri:
+    process.env.NODE_ENV === "production"
+      ? "wss://nomad-nuber-eats-backend.herokuapp.com/graphql"
+      : `ws://localhost:4000/graphql`,
   options: {
     reconnect: true,
     connectionParams: {
-      'x-jwt' : authTokenVar() || "",
-    }
+      "x-jwt": authTokenVar() || "",
+    },
   },
 });
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:4000/graphql",
+  uri:
+    process.env.NODE_ENV === "production"
+      ? "https://nomad-nuber-eats-backend.herokuapp.com/graphql"
+      : "http://localhost:4000/graphql",
 });
 
 const authLink = setContext((_, { headers }) => {
