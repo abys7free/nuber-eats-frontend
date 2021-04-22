@@ -5,6 +5,8 @@ import { FULL_ORDER_FRAGMENT } from '../../fragments';
 import { cookedOrders } from '../../__generated__/cookedOrders';
 import { useHistory } from 'react-router-dom';
 import { takeOrder, takeOrderVariables } from '../../__generated__/takeOrder';
+import { orderLatLngVar } from '../../apollo';
+import { replace } from 'cypress/types/lodash';
 
 const COOKED_ORDERS_SUBSCRIPTION = gql`
   subscription cookedOrders {
@@ -42,29 +44,24 @@ export const Dashboard = () => {
   const [maps, setMaps] = useState<any>()
   // @ts-ignore
   const onSuccess = ({ coords: { latitude, longitude } }: Position) => {
-    setDriverCoords({ lat: latitude, lng: longitude })
+    setDriverCoords({ lat: 34.053477, lng: -118.242893 })
+    console.log("watch loaded")
   }
   // @ts-ignore
   const onError = (error: PositionError) => {
     console.log(error)
   }
+
   useEffect(() => {
     navigator.geolocation.watchPosition(onSuccess, onError, {
       enableHighAccuracy: true,
     })
+    console.log('watch')
   }, [])
   useEffect(() => {
     if (map && maps) {
       map.panTo(new google.maps.LatLng(driverCoords.lat, driverCoords.lng));
-      // const geocoder = new google.maps.Geocoder()
-      // geocoder.geocode(
-      //   {
-      //     location: new google.maps.LatLng(driverCoords.lat, driverCoords.lng),
-      //   },
-      //   (results, status) => {
-      //     console.log(status, results)
-      //   }
-      // );
+      console.log("driver:", driverCoords)
     }
   }, [driverCoords.lat, driverCoords.lng])
   const onApiLoaded = ({ map, maps }: { map: any, maps: any }) => {
@@ -72,53 +69,119 @@ export const Dashboard = () => {
     setMap(map);
     setMaps(maps);
   };
-  const makeRoute = () => {
+
+  const makeRoute = (startPlace: google.maps.Place, orderPlace: google.maps.Place, restaurantLatLng: google.maps.Place) => {
     if (map) {
       const directionsService = new google.maps.DirectionsService();
       const directionsRenderer = new google.maps.DirectionsRenderer({
         draggable: true,
-        polylineOptions: {
-          strokeColor: '#000',
-          strokeOpacity: 0.8,
-          strokeWeight: 3,
-        }
+        // polylineOptions: {
+        //   strokeColor: '#000',
+        //   strokeOpacity: 0.8,
+        //   strokeWeight: 3,
+        // },
       });
       directionsRenderer.setMap(map);
-      directionsService.route(
-        {
-          origin: {
-            location: new google.maps.LatLng(
-              driverCoords.lat,
-              driverCoords.lng
-            ),
+      if (startPlace && orderPlace && restaurantPlace) {
+        console.log("route start")
+        directionsService.route(
+          {
+            origin: { placeId: startPlace.placeId },
+            destination: { placeId: orderPlace.placeId },
+            travelMode: google.maps.TravelMode.BICYCLING,
+            waypoints: [{
+              location: {
+                placeId: restaurantPlace?.placeId
+              }
+            }]
+          }, (result) => {
+            console.log(result)
+            directionsRenderer.setDirections(result);
           },
-          destination: {
-            location: new google.maps.LatLng(
-              driverCoords.lat + 0.05,
-              driverCoords.lng + 0.05
-            )
-          },
-          travelMode: google.maps.TravelMode.WALKING,
-        }, (result) => {
-          console.log(result)
-          directionsRenderer.setDirections(result);
-        },
-      )
+        )
+      }
     }
   }
   const { data: cookedOrdersData } = useSubscription<cookedOrders>(
     COOKED_ORDERS_SUBSCRIPTION
   );
+  const [orderPlace, setOrderPlace] = useState<google.maps.Place>();
+  const [restaurantPlace, setRestaurantPlace] = useState<google.maps.Place>();
+  const [startPlace, setStartPlace] = useState<google.maps.Place>();
+
   useEffect(() => {
+    console.log('getOrder Start')
+    console.log('getOrder cookedOrder', cookedOrdersData?.cookedOrders);
+
     if (cookedOrdersData?.cookedOrders.id) {
-      console.log(cookedOrdersData)
-      makeRoute();
+      const { orderAddress, restaurant } = cookedOrdersData?.cookedOrders
+      if (orderAddress && restaurant?.address) {
+        const geocoder = new google.maps.Geocoder();
+        if (orderAddress && restaurant.address) {
+          geocoder.geocode(
+            {
+              address: orderAddress,
+            },
+            (results, status) => {
+              console.log(status)
+              console.log(results)
+              setOrderPlace({
+                location: results[0].geometry.location,
+                placeId: results[0].place_id
+              })
+            }
+          );
+          geocoder.geocode(
+            {
+              address: restaurant.address,
+            },
+            (results, status) => {
+              console.log(status)
+              console.log(results)
+              setRestaurantPlace({
+                location: results[0].geometry.location,
+                placeId: results[0].place_id
+              })
+            }
+          );
+
+          geocoder.geocode(
+            {
+              location: {
+                lat: driverCoords.lat,
+                lng: driverCoords.lng,
+              }
+            },
+            (results, status) => {
+              console.log(status)
+              console.log(results)
+              setStartPlace(results &&
+              {
+                location: results[0].geometry.location,
+                placeId: results[0].place_id
+              }
+              )
+            }
+          );
+        }
+      }
+      console.log(orderAddress, startPlace, orderPlace, "geocode");
     }
   }, [cookedOrdersData])
+
+  useEffect(() => {
+    console.log("orderPlace: ", startPlace, orderPlace)
+    if (startPlace && orderPlace && restaurantPlace) {
+      makeRoute(startPlace, orderPlace, restaurantPlace)
+    }
+  }, [orderPlace, startPlace, restaurantPlace])
+
   const history = useHistory();
+  const [orderAccept, setOrderAccept] = useState(false);
   const onCompleted = (data: takeOrder) => {
     if (data.takeOrder.ok) {
-      history.push(`/orders/${cookedOrdersData?.cookedOrders.id}`)
+      setOrderAccept(true);
+      // history.push(`/orders/${cookedOrdersData?.cookedOrders.id}`)
     }
   }
   const [takeOrderMuation] = useMutation<takeOrder, takeOrderVariables>(TAKE_ORDER_MUTATION,
@@ -146,8 +209,8 @@ export const Dashboard = () => {
           defaultZoom={15}
           defaultCenter={
             {
-              lat: 35.59,
-              lng: 124.95,
+              lat: 34.053477,
+              lng: -118.242893,
             }
           }
           bootstrapURLKeys={{ key: "AIzaSyBMMLxClVwhMZfaV-NPLmDV0le8rO3up28" }}

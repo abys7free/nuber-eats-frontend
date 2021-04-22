@@ -7,6 +7,8 @@ import { DISH_FRAGMENT, FULL_ORDER_FRAGMENT, ORDERS_FRAGMENT, RESTAURANT_FRAGMEN
 import { myRestaurant, myRestaurantVariables } from '../../__generated__/myRestaurant'
 import { VictoryTheme, VictoryChart, VictoryAxis, VictoryLabel, VictoryVoronoiContainer, VictoryLine, VictoryTooltip } from 'victory'
 import { pendingOrders } from '../../__generated__/pendingOrders'
+import { DishOption } from '../../components/dish-option'
+import { Helmet } from 'react-helmet-async'
 
 export const MY_RESTAURANT_QUERY = gql`
   query myRestaurant($input: MyRestaurantInput!){
@@ -54,7 +56,9 @@ export const MyRestaurant = () => {
       }
     }
   );
-  const { data: subscriptionData } = useSubscription<pendingOrders>(PENDING_ORDERS_SUBSCRIPTION);
+  const { data: subscriptionData } = useSubscription<pendingOrders>(
+    PENDING_ORDERS_SUBSCRIPTION
+  );
   const history = useHistory()
   useEffect(() => {
     if (subscriptionData?.pendingOrders.id) {
@@ -63,37 +67,62 @@ export const MyRestaurant = () => {
   }, [subscriptionData])
   return (
     <div>
+      <Helmet>
+        <title>My Restaurant | Nuber Eats</title>
+      </Helmet>
       <div
-        className="  bg-gray-700  py-28 bg-center bg-cover"
+        className=" bg-gray-800 bg-center bg-cover pt-56 pb-4"
         style={{
           backgroundImage: `url(${data?.myRestaurant.restaurant?.coverImg})`,
         }}
-      ></div>
-      <div className="container mt-10">
-        <h2 className="text-4xl font-medium mb-10">
-          {data?.myRestaurant.restaurant?.name || "Loading..."}
-        </h2>
-        <Link to={`/restaurants/${id}/add-dish`} className=" mr-8 text-white bg-gray-800 py-3 px-10">
-          Add Dish &rarr;
-      </Link>
-        <Link to={``} className=" text-white bg-lime-700 py-3 px-10">
-          Buy Promotion &rarr;
-      </Link>
-        <div className='mt-10'>
-          {data?.myRestaurant.restaurant?.menu.length === 0 ?
-            <h4 className='text-lg mb-5'>Please upload a dish!</h4>
-            : (
-              <div className="grid mt-16 md:grid-cols-3 gap-x-5 gap-y-10">
-                {data?.myRestaurant.restaurant?.menu.map((dish, index) => (
-                  <Dish
-                    key={index}
-                    name={dish.name}
-                    description={dish.description}
-                    price={dish.price} />))}
-              </div>
-            )}
+      >
+        <div className="text-white pl-5 hidden md:block items-end">
+          <h4 className="text-4xl mb-3">{data?.myRestaurant.restaurant?.name}</h4>
+          <h5 className="text-sm font-light mb-2">
+            {data?.myRestaurant.restaurant?.category?.name}
+          </h5>
+          <h6 className="text-sm font-light">
+            {data?.myRestaurant.restaurant?.address}
+          </h6>
         </div>
-        <div className="mt-20 mb-10">
+      </div>
+
+      <div className="text-black mt-4 pl-5 md:hidden">
+        <h4 className="text-2xl mb-3">{data?.myRestaurant.restaurant?.name}</h4>
+        <h5 className="text-sm font-light mb-2">
+          {data?.myRestaurant.restaurant?.category?.name}
+        </h5>
+        <h6 className="text-sm font-light">
+          {data?.myRestaurant.restaurant?.address}
+        </h6>
+      </div>
+
+      <div className="container pb-32 flex flex-col items-end mt-5">
+        <div className='mt-5 mb-2'>
+          <Link to={`/restaurants/add-dish`} className=" mr-3 text-white bg-gray-800 py-3 inline-block w-40 text-center">
+            Add Dish &rarr;
+                </Link>
+          <Link to={``} className=" text-white bg-lime-700 py-3 inline-block w-40 text-center">
+            Buy Promotion &rarr;
+                </Link>
+        </div>
+        <div className="grid mt-8 md:mt-16 md:grid-cols-2 gap-x-5 gap-y-10 w-full lg:grid-cols-3">
+          {data?.myRestaurant.restaurant?.menu.map((dish, index) => (
+            <Dish
+              id={dish.id}
+              key={index}
+              name={dish.name}
+              description={dish.description}
+              price={dish.price}
+              photo={dish.photo}
+              isCustomer={true}
+              options={dish.options}
+            >
+            </Dish>
+          ))}
+
+        </div>
+        {/* <div className="mt-20 mb-10">
           <h4 className="text-center text-2xl font-medium">Sales</h4>
           <div className="  mt-10">
             <VictoryChart
@@ -135,7 +164,7 @@ export const MyRestaurant = () => {
             </VictoryChart>
 
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

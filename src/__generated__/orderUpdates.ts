@@ -22,6 +22,7 @@ export interface orderUpdates_orderUpdates_customer {
 export interface orderUpdates_orderUpdates_restaurant {
   __typename: "Restaurant";
   name: string;
+  address: string;
 }
 
 export interface orderUpdates_orderUpdates {
@@ -29,6 +30,7 @@ export interface orderUpdates_orderUpdates {
   id: number;
   status: OrderStatus;
   total: number | null;
+  orderAddress: string | null;
   driver: orderUpdates_orderUpdates_driver | null;
   customer: orderUpdates_orderUpdates_customer | null;
   restaurant: orderUpdates_orderUpdates_restaurant | null;

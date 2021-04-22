@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery, useReactiveVar } from "@apollo/client";
 import React, { useState } from "react";
 import { Helmet } from "react-helmet";
 import { useHistory, useParams } from "react-router-dom";
@@ -15,6 +15,7 @@ import { faCheckSquare as faCheckSquareS } from "@fortawesome/free-solid-svg-ico
 import { faCheckSquare as faCheckSquareR } from "@fortawesome/free-regular-svg-icons";
 import { DishOption } from "../../components/dish-option";
 import { createOrder, createOrderVariables } from '../../__generated__/createOrder';
+import { addressVar, orderLatLngVar } from "../../apollo";
 
 
 const RESTAURANT_QUERY = gql`
@@ -52,6 +53,9 @@ interface IRestaurantParams {
 
 export const Restaurant = () => {
   const params = useParams<IRestaurantParams>();
+  const orderAddress = useReactiveVar(addressVar);
+  const orderLatLng = useReactiveVar(orderLatLngVar);
+
   const { data } = useQuery<restaurant, restaurantVariables>(
     RESTAURANT_QUERY,
     {
@@ -128,6 +132,7 @@ export const Restaurant = () => {
   const onCompleted = (data: createOrder) => {
     const { createOrder: { ok, orderId } } = data;
     if (ok) {
+      const { lat, lng } = orderLatLng;
       history.push(`/orders/${orderId}`)
     }
   }
@@ -155,6 +160,7 @@ export const Restaurant = () => {
           input: {
             restaurantId: +params.id,
             items: orderItems,
+            orderAddress,
           }
         }
       })
@@ -168,12 +174,12 @@ export const Restaurant = () => {
         <title>{data?.restaurant.restaurant?.name || ""} | Nuber Eats</title>
       </Helmet>
       <div
-        className=" bg-gray-800 bg-center bg-cover py-48"
+        className=" bg-gray-800 bg-center bg-cover pt-56 pb-4"
         style={{
           backgroundImage: `url(${data?.restaurant.restaurant?.coverImg})`,
         }}
       >
-        <div className="bg-white w-3/12 py-8 pl-48">
+        <div className="text-white pl-5 hidden md:block items-end">
           <h4 className="text-4xl mb-3">{data?.restaurant.restaurant?.name}</h4>
           <h5 className="text-sm font-light mb-2">
             {data?.restaurant.restaurant?.category?.name}
@@ -183,23 +189,34 @@ export const Restaurant = () => {
           </h6>
         </div>
       </div>
-      <div className="container pb-32 flex flex-col items-end  mt-20">
+
+      <div className="text-black mt-4 pl-5 md:hidden">
+        <h4 className="text-2xl mb-3">{data?.restaurant.restaurant?.name}</h4>
+        <h5 className="text-sm font-light mb-2">
+          {data?.restaurant.restaurant?.category?.name}
+        </h5>
+        <h6 className="text-sm font-light">
+          {data?.restaurant.restaurant?.address}
+        </h6>
+      </div>
+
+      <div className="container pb-32 flex flex-col items-end mt-5">
         {!orderStarted && (
-          <button onClick={triggerStartOrder} className="btn px-10">
+          <button onClick={triggerStartOrder} className="btn py-2 px-3 md:px-10 roun">
             {orderStarted ? "Ordering" : "Start Order"}
           </button>
         )}
         {orderStarted && (
           <div className="flex items-center">
-            <button onClick={triggerConfirmOrder} className="btn px-10 mr-1">
-              Confirm Order
+            <button onClick={triggerConfirmOrder} className="btn py-2 w-24 mr-1">
+              Confirm
           </button>
-            <button onClick={triggerCancelOrder} className="btn px-10 bg-black hover:bg-black">
-              Cancel Order
+            <button onClick={triggerCancelOrder} className="btn py-2 w-24 bg-black hover:bg-black">
+              Reset
           </button>
           </div>
         )}
-        <div className="grid mt-16 md:grid-cols-3 gap-x-5 gap-y-10 w-full">
+        <div className="grid mt-8 md:mt-16 md:grid-cols-2 gap-x-5 gap-y-10 w-full lg:grid-cols-3">
           {data?.restaurant.restaurant?.menu.map((dish, index) => (
             <Dish
               isSelected={isSelected(dish.id)}
@@ -209,6 +226,7 @@ export const Restaurant = () => {
               name={dish.name}
               description={dish.description}
               price={dish.price}
+              photo={dish.photo}
               isCustomer={true}
               options={dish.options}
               addItemToOrder={addItemToOrder}

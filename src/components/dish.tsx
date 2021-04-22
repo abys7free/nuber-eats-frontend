@@ -6,6 +6,7 @@ interface IDishProps {
   description: string;
   name: string;
   price: number;
+  photo?: string | null;
   isCustomer?: boolean;
   orderStarted?: boolean;
   options?: restaurant_restaurant_restaurant_menu_options[] | null
@@ -19,6 +20,7 @@ export const Dish: React.FC<IDishProps> = ({
   description,
   name,
   price,
+  photo,
   isCustomer = false,
   orderStarted = false,
   options,
@@ -39,25 +41,32 @@ export const Dish: React.FC<IDishProps> = ({
   }
   return (
     <div
-      className={`px-8 py-4 border cursor-pointer hover:border-gray-800 transition-all ${isSelected ? "border-gray-800" : ""}`}>
-      <div className="mb-5">
-        <h3 className="text-lg font-medium ">{name}
-          {orderStarted && <button
-            className={`ml-3 py-1 px-3 focus:outline-none text-sm  text-white ${isSelected ? "bg-red-500" : " bg-lime-600"
-              }`}
-            onClick={onClick}
-          >
-            {isSelected ? "Remove" : "Add"}
-          </button>}</h3>
-        <h4 className="font-medium">{description}</h4>
-      </div>
-      <span>${price}</span>
-      {isCustomer && options && options.length !== 0 && (
-        <div>
-          <h5 className="mt-8 mb-3 font-medium">Dish Options:</h5>
-          {dishOptions}
+      className={`border cursor-pointer hover:border-gray-600 transition-all ${isSelected ? "bg-yellow-100" : ""}`}
+      onClick={onClick}
+      >
+      <div className="flex justify-around h-full">
+        <div className="w-3/5 p-3 flex flex-col justify-around">
+          <div>
+            <h3 className="text-lg font-medium">{name}</h3>
+            <h4 className="font-medium">{description}</h4>
+          </div>
+          <div className="mt-3">
+            <span>${price}</span>
+            {isCustomer && options && options.length !== 0 && (
+              <div>
+                <h5 className="mt-5 mb-3 font-medium">Dish Options:</h5>
+                {dishOptions}
+              </div>
+            )}
+          </div>
         </div>
-      )}
+        <div
+          className="w-2/5 bg-center bg-cover"
+          style={{
+            backgroundImage: `url(${photo})`,
+          }}
+        />
+      </div>
     </div>
   );
 };

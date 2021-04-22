@@ -79,7 +79,6 @@ export const Order = () => {
             }
           }
         }
-
       })
     }
   }, [data])
@@ -92,7 +91,6 @@ export const Order = () => {
         }
       }
     })
-
   }
   return (
     <div className="mt-32 container flex justify-center">

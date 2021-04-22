@@ -12,8 +12,20 @@ import { getMainDefinition } from "@apollo/client/utilities";
 
 const token = localStorage.getItem(LOCALSTORAGE_TOKEN);
 
+
+const address = localStorage.getItem('user-address')
+const addressDetail = localStorage.getItem('user-addressDetail')
+
+
 export const isLoggedInVar = makeVar(Boolean(token));
 export const authTokenVar = makeVar(token);
+export const addressVar = makeVar(address || '');
+export const addressDetailVar = makeVar(addressDetail || '');
+export const orderLatLngVar = makeVar<{lat:number, lng:number}>({
+  lat: 0,
+  lng: 0,
+});
+
 
 const wsLink = new WebSocketLink({
   uri:
@@ -70,6 +82,21 @@ export const client = new ApolloClient({
           token: {
             read() {
               return authTokenVar();
+            },
+          },
+          address: {
+            read() {
+              return addressVar();
+            },
+          },
+          addressDetail: {
+            read() {
+              return addressDetailVar();
+            },
+          },
+          orderLatLng: {
+            read() {
+              return orderLatLngVar();
             },
           },
         },

@@ -54,6 +54,7 @@ export const FULL_ORDER_FRAGMENT = gql`
     id
     status
     total
+    orderAddress
     driver {
       email
     }
@@ -62,6 +63,7 @@ export const FULL_ORDER_FRAGMENT = gql`
     }
     restaurant {
       name
+      address
     }
   }
 `;

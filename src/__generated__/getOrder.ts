@@ -22,6 +22,7 @@ export interface getOrder_getOrder_order_customer {
 export interface getOrder_getOrder_order_restaurant {
   __typename: "Restaurant";
   name: string;
+  address: string;
 }
 
 export interface getOrder_getOrder_order {
@@ -29,6 +30,7 @@ export interface getOrder_getOrder_order {
   id: number;
   status: OrderStatus;
   total: number | null;
+  orderAddress: string | null;
   driver: getOrder_getOrder_order_driver | null;
   customer: getOrder_getOrder_order_customer | null;
   restaurant: getOrder_getOrder_order_restaurant | null;

@@ -6,7 +6,7 @@
 }
 
 .container {
-  @apply max-w-screen-xl mx-auto;
+  @apply max-w-screen-2xl mx-auto;
 }
 
 .link {

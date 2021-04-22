@@ -22,6 +22,7 @@ export interface pendingOrders_pendingOrders_customer {
 export interface pendingOrders_pendingOrders_restaurant {
   __typename: "Restaurant";
   name: string;
+  address: string;
 }
 
 export interface pendingOrders_pendingOrders {
@@ -29,6 +30,7 @@ export interface pendingOrders_pendingOrders {
   id: number;
   status: OrderStatus;
   total: number | null;
+  orderAddress: string | null;
   driver: pendingOrders_pendingOrders_driver | null;
   customer: pendingOrders_pendingOrders_customer | null;
   restaurant: pendingOrders_pendingOrders_restaurant | null;

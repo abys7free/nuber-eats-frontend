@@ -15,7 +15,7 @@ export const Restaurant: React.FC<IRestaurantProps> = ({
   categoryName,
 }) => (
   <Link to={`/restaurants/${id}`}>
-    <div className="flex flex-col">
+    <div className="flex flex-col px-5">
       <div
         style={{ backgroundImage: `url(${coverImg})` }}
         className="bg-cover bg-center mb-3 py-28"

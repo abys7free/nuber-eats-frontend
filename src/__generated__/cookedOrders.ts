@@ -22,6 +22,7 @@ export interface cookedOrders_cookedOrders_customer {
 export interface cookedOrders_cookedOrders_restaurant {
   __typename: "Restaurant";
   name: string;
+  address: string;
 }
 
 export interface cookedOrders_cookedOrders {
@@ -29,6 +30,7 @@ export interface cookedOrders_cookedOrders {
   id: number;
   status: OrderStatus;
   total: number | null;
+  orderAddress: string | null;
   driver: cookedOrders_cookedOrders_driver | null;
   customer: cookedOrders_cookedOrders_customer | null;
   restaurant: cookedOrders_cookedOrders_restaurant | null;

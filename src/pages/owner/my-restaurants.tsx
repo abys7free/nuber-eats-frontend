@@ -27,7 +27,7 @@ export const MyRestaurants = () => {
         <title>My restaurants | Nuber Eats</title>
       </Helmet>
       <div className="max-w-screen-xl mx-auto mt-32">
-        <h2 className="text-4xl font-medium mb-10">My Restaurants</h2>
+        <h2 className="text-4xl ml-5 font-medium mb-10">My Restaurants</h2>
         {data?.myRestaurants.ok && data.myRestaurants.restaurants.length === 0 ? (
           <>
             <h4 className="text-xl mb-5">You have no restaurants.</h4>
@@ -36,7 +36,7 @@ export const MyRestaurants = () => {
           </Link>
           </>
         ) :
-          <div className="grid mt-16 md:grid-cols-3 gap-x-5 gap-y-10">
+          <div className="grid mt-8 md:grid-cols-3 gap-x-5 gap-y-10">
             {data?.myRestaurants.restaurants?.map((restaurant) => (
               <Restaurant
                 key={restaurant.id}

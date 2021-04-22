@@ -112,7 +112,7 @@ export const AddRestaurant = () => {
         <input className="input" type="text" name="categoryName" placeholder="Category Name" ref={register({ required: "Category Name is required" })} />
 
         <div>
-          <input type="file" name='file' accept="image/*" ref={register({ required: true })} />
+          <input type="file" name='file' accept="image/*" ref={register({ required: false })} />
         </div>
         <Button loading={uploading} canClick={formState.isValid} actionText="Create Restaurant" />
         {data?.createRestaurant.error && <FormError errorMessage={data.createRestaurant.error} />}

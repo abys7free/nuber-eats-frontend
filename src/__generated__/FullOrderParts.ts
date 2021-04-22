@@ -22,6 +22,7 @@ export interface FullOrderParts_customer {
 export interface FullOrderParts_restaurant {
   __typename: "Restaurant";
   name: string;
+  address: string;
 }
 
 export interface FullOrderParts {
@@ -29,6 +30,7 @@ export interface FullOrderParts {
   id: number;
   status: OrderStatus;
   total: number | null;
+  orderAddress: string | null;
   driver: FullOrderParts_driver | null;
   customer: FullOrderParts_customer | null;
   restaurant: FullOrderParts_restaurant | null;
