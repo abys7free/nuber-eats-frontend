@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 interface IRestaurantProps {
   id: string;
-  coverImg: string;
+  coverImg: string | null;
   name: string;
   categoryName?: string;
 }

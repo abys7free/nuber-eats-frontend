@@ -48,7 +48,7 @@ export const Dish: React.FC<IDishProps> = ({
         <div className="w-3/5 p-3 flex flex-col justify-around">
           <div>
             <h3 className="text-lg font-medium">{name}</h3>
-            <h4 className="font-medium">{description}</h4>
+            <h4 className="mt-1 text-gray-500">{description}</h4>
           </div>
           <div className="mt-3">
             <span>${price}</span>

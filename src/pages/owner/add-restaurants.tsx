@@ -76,19 +76,22 @@ export const AddRestaurant = () => {
       const { file, name, categoryName, address, } = getValues()
       const actualFile = file[0]
       const formBody = new FormData();
+      let coverImg: any;
       formBody.append('file', actualFile)
-      const { url: coverImg } = await (await fetch("http://localhost:4000/uploads/", {
-        method: 'POST',
-        body: formBody
-      })).json();
-      setImageUrl(coverImg);
+      if (actualFile) {
+        const { url: coverImg } = await (await fetch("http://localhost:4000/uploads/", {
+          method: 'POST',
+          body: formBody
+        })).json();
+        setImageUrl(coverImg);
+      }
       createRestaurantMutation({
         variables: {
           input: {
             name,
             categoryName,
             address,
-            coverImg,
+            ...(coverImg && { coverImg }),
           }
         }
       })

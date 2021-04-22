@@ -53,8 +53,8 @@ export interface CreateOrderItemInput {
 
 export interface CreateRestaurantInput {
   name: string;
-  coverImg: string;
   address: string;
+  coverImg?: string | null;
   categoryName: string;
 }
 

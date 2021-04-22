@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet';
 import { useHistory, useLocation } from 'react-router';
 import { RESTAURANT_FRAGMENT, CATEGORY_FRAGMENT } from '../../fragments';
 import { searchRestaurant, searchRestaurantVariables } from '../../__generated__/searchRestaurant';
+import { Restaurant } from "../../components/restaurant";
+
 
 const SEARCH_RESTAURANT = gql`
   query searchRestaurant(
@@ -20,7 +22,6 @@ const SEARCH_RESTAURANT = gql`
     }
   }
   ${RESTAURANT_FRAGMENT}
-  ${CATEGORY_FRAGMENT}
 `
 
 
@@ -49,7 +50,18 @@ export const Search = () => {
       <Helmet>
         <title>Home | Nuber</title>
       </Helmet>
-      <h1>Search Page</h1>
+      <h1 className="py-5 pl-5 text-2xl font-medium">Search Result</h1>
+      <div className="grid md:grid-cols-3 gap-x-5 gap-y-10">
+        {data?.searchRestaurant.restaurants?.map((restaurant) => (
+          <Restaurant
+            key={restaurant.id}
+            id={restaurant.id + ""}
+            coverImg={restaurant.coverImg}
+            name={restaurant.name}
+            categoryName={restaurant.category?.name}
+          />
+        ))}
+      </div>
     </div>
   )
 }

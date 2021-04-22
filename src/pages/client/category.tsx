@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import React from "react";
 import { useLocation, useParams } from "react-router-dom";
+import { Restaurant } from "../../components/restaurant";
 import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
 import { category, categoryVariables } from "../../__generated__/category";
 
@@ -41,5 +42,20 @@ export const Category = () => {
     }
   );
   console.log(data);
-  return <h1>Category</h1>;
+  return (
+    <>
+      <h1 className="py-5 pl-5 text-2xl font-medium">{params.slug.toUpperCase()}</h1>
+      <div className="grid md:grid-cols-3 gap-x-5 gap-y-10">
+        {data?.category.restaurants?.map((restaurant) => (
+          <Restaurant
+            key={restaurant.id}
+            id={restaurant.id + ""}
+            coverImg={restaurant.coverImg}
+            name={restaurant.name}
+            categoryName={restaurant.category?.name}
+          />
+        ))}
+      </div>
+    </>
+  );
 };
