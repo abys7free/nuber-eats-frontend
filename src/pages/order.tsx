@@ -9,7 +9,7 @@ import { getOrder, getOrderVariables } from '../__generated__/getOrder';
 import { UserRole, OrderStatus } from '../__generated__/globalTypes';
 import { orderUpdates } from '../__generated__/orderUpdates';
 
-const GET_ORDER = gql`
+export const GET_ORDER = gql`
   query getOrder($input: GetOrderInput!){
     getOrder(input: $input){
       ok
@@ -22,7 +22,7 @@ const GET_ORDER = gql`
   ${FULL_ORDER_FRAGMENT}
 `
 
-const ORDER_SUBSCRIPTION = gql`
+export const ORDER_SUBSCRIPTION = gql`
   subscription orderUpdates($input: OrderUpdatesInput!){
     orderUpdates(input: $input){
       ...FullOrderParts
@@ -31,7 +31,7 @@ const ORDER_SUBSCRIPTION = gql`
   ${FULL_ORDER_FRAGMENT}
 `
 
-const EDIT_ORDER = gql`
+export const EDIT_ORDER = gql`
   mutation editOrder($input: EditOrderInput!){
     editOrder(input:$input){
       ok
@@ -93,11 +93,19 @@ export const Order = () => {
     })
   }
   return (
-    <div className="mt-32 container flex justify-center">
+    <div className="container flex flex-col justify-center items-center">
       <Helmet>
         <title>Order #{params.id}</title>
       </Helmet>
-      <div className="border border-gray-800 w-full max-w-screen-sm flex flex-col justify-center">
+      {data?.getOrder.order?.status === OrderStatus.Delivered &&
+        (
+          (<div className="mt-16">
+            <span className=" text-center text-2xl text-lime-600">
+              Thank you for using nuber-eats.
+              </span>
+          </div>)
+        )}
+      <div className="mt-16 border border-gray-800 w-full max-w-screen-sm flex flex-col justify-center">
         <h4 className="bg-gray-800 w-full py-5 text-white text-center text-xl">
           Order #{params.id}
         </h4>
@@ -146,26 +154,14 @@ export const Order = () => {
                 )}
             </>
           )}
-          {userData?.me.role === UserRole.Delivery && (
-            <>
-              {data?.getOrder.order?.status === OrderStatus.Cooked && (
-                <button
-                  onClick={() => onButtonClick(OrderStatus.PickedUp)}
-                  className="btn">Picked Up</button>
-              )}
-              {data?.getOrder.order?.status === OrderStatus.PickedUp && (
-                <button
-                  onClick={() => onButtonClick(OrderStatus.Delivered)}
-                  className="btn">Order Deliverd</button>
-              )}
-            </>
-          )}
-          {data?.getOrder.order?.status === OrderStatus.Delivered &&
+          {/* {data?.getOrder.order?.status === OrderStatus.Delivered &&
             (
-              (<span className=" text-center mt-5 mb-3  text-2xl text-lime-600">
+              (<div className="absolute w-screen h-screen top-0 left-0 bottom-0 flex justify-center items-center">
+                <span className="px-2 py-1 text-center text-2xl bg-gray-800 bg-opacity-50 text-white">
                 Thank you for using nuber-eats.
-              </span>)
-            )}
+              </span>
+              </div>)
+            )} */}
 
         </div>
       </div>

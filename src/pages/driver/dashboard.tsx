@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import GoogleMapReact from 'google-map-react';
-import { gql, useMutation, useSubscription } from '@apollo/client';
+import { gql, useLazyQuery, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { FULL_ORDER_FRAGMENT } from '../../fragments';
 import { cookedOrders } from '../../__generated__/cookedOrders';
 import { useHistory } from 'react-router-dom';
 import { takeOrder, takeOrderVariables } from '../../__generated__/takeOrder';
 import { orderLatLngVar } from '../../apollo';
 import { replace } from 'cypress/types/lodash';
+import { OrderStatus } from '../../__generated__/globalTypes';
+import { editOrder, editOrderVariables } from '../../__generated__/editOrder';
+import { getOrder, getOrderVariables } from '../../__generated__/getOrder';
+import { GET_ORDER, EDIT_ORDER, ORDER_SUBSCRIPTION } from '../order'
+import { orderUpdates } from '../../__generated__/orderUpdates';
 
 const COOKED_ORDERS_SUBSCRIPTION = gql`
   subscription cookedOrders {
@@ -110,6 +115,7 @@ export const Dashboard = () => {
   const [startPlace, setStartPlace] = useState<google.maps.Place>();
 
   useEffect(() => {
+
     console.log('getOrder Start')
     console.log('getOrder cookedOrder', cookedOrdersData?.cookedOrders);
 
@@ -181,7 +187,11 @@ export const Dashboard = () => {
   const onCompleted = (data: takeOrder) => {
     if (data.takeOrder.ok) {
       setOrderAccept(true);
+      setOrderId(cookedOrdersData?.cookedOrders.id)
+      setOrderState(OrderStatus.Cooked);
+      console.log(orderAccept, orderState, orderId);
       // history.push(`/orders/${cookedOrdersData?.cookedOrders.id}`)
+      // 완료치는거 옮겨오기!
     }
   }
   const [takeOrderMuation] = useMutation<takeOrder, takeOrderVariables>(TAKE_ORDER_MUTATION,
@@ -189,6 +199,9 @@ export const Dashboard = () => {
       onCompleted
     }
   )
+  const [orderId, setOrderId] = useState<number>();
+  const [orderState, setOrderState] = useState<OrderStatus | undefined>();
+
   const triggerMutation = (orderId: number) => {
     takeOrderMuation({
       variables: {
@@ -197,7 +210,49 @@ export const Dashboard = () => {
         }
       }
     })
+    console.log("trigger Mutation");
   }
+  const [editOrderMutation] = useMutation<editOrder, editOrderVariables
+  >(EDIT_ORDER, {
+
+  })
+
+  const [callQuery, { loading, data: orderData, called }] = useLazyQuery<getOrder, getOrderVariables>(GET_ORDER);
+  useEffect(() => {
+    if (!orderId) {
+      return
+    }
+    callQuery({
+      variables: {
+        input: {
+          id: orderId
+        }
+      }
+    })
+  }, [orderId, orderState])
+  const onButtonClick = (newStatus: OrderStatus, id: number) => {
+    editOrderMutation({
+      variables: {
+        input: {
+          id,
+          status: newStatus
+        }
+      }
+    })
+    if (newStatus === OrderStatus.PickedUp) {
+      setOrderState(OrderStatus.PickedUp);
+      console.log("PickedUp")
+    } else if (newStatus === OrderStatus.Delivered) {
+      setOrderId(undefined);
+      setOrderState(OrderStatus.Delivered);
+      console.log("delivered")
+      setTimeout(() => {
+        window.location.reload(false);
+        
+      }, 3000)
+    }
+  }
+
   return (
     <div>
       <div
@@ -221,9 +276,45 @@ export const Dashboard = () => {
       <div className="max-w-screen-sm mx-auto bg-white relative -top-10 shadow-lg py-8 px-5">
         {cookedOrdersData?.cookedOrders.restaurant ? (
           <>
-            <h1 className="text-center text-3xl font-medium">New Cooked Order</h1>
-            <h4 className="text-center my-3 text-2xl font-medium">Pick it up Soon! @ {cookedOrdersData.cookedOrders.restaurant?.name}</h4>
-            <button onClick={() => triggerMutation(cookedOrdersData.cookedOrders.id)} className="btn w-full block text-center mt-5">Accept Challenge &rarr;</button>
+            {orderState !== OrderStatus.Delivered &&
+              <>
+                <h1 className="text-center text-3xl font-medium">
+                  New Cooked Order
+              </h1>
+                <h4 className="text-center my-3 text-2xl font-medium">Pick it up Soon! @ {cookedOrdersData.cookedOrders.restaurant?.name}</h4>
+              </>
+            }
+            {orderState === OrderStatus.Delivered &&
+              <div>
+                <h1 className="text-center text-3xl font-medium">
+                  Thank you for your service!
+                </h1>
+                <h4 className="text-center my-3 text-2xl font-medium">Refreshed in 3s!</h4>
+              </div>
+            }
+
+            {!orderAccept && <button onClick={() => triggerMutation(cookedOrdersData.cookedOrders.id)}
+              className="btn w-full block text-center mt-5">
+              Accept Challenge →
+            </button>}
+            {orderAccept
+              && orderState === OrderStatus.Cooked
+              && orderId
+              && (
+                <button
+                  onClick={() => onButtonClick(OrderStatus.PickedUp, orderId)}
+                  className="btn w-full block text-center mt-5">Picked Up?</button>
+              )
+            }
+            {orderAccept
+              && orderState === OrderStatus.PickedUp
+              && orderId
+              && (
+                <button
+                  onClick={() => onButtonClick(OrderStatus.Delivered, orderId)}
+                  className="btn w-full block text-center mt-5">Order Deliverd?</button>
+              )
+            }
           </>
         ) : (
           <h1 className="text-center text-3xl font-medium">
@@ -231,6 +322,7 @@ export const Dashboard = () => {
           </h1>
         )}
       </div>
-    </div>
+    </div >
   )
 }
+
