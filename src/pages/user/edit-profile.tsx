@@ -77,6 +77,7 @@ export const EditProfile = () => {
     localStorage.setItem(LOCALSTORAGE_TOKEN, "")
     authTokenVar("");
     isLoggedInVar(false);
+    client.clearStore();
     history.push('/');
   }
   return (
